@@ -1,0 +1,6 @@
+framework module Pods_SearchAssignment {
+  umbrella header "Pods-SearchAssignment-umbrella.h"
+
+  export *
+  module * { export * }
+}
