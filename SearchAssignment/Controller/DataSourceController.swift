@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Kingfisher
 
 //Mark: - UICollectionViewDataSource
 extension SearchViewController: UICollectionViewDataSource {
@@ -47,5 +48,4 @@ extension SearchViewController: UICollectionViewDataSource {
         (cell.productNameLabel).topAnchor.constraint(equalTo: cell.productImage.bottomAnchor , constant: 20).isActive = true
         return cell
     }
-    
 }
