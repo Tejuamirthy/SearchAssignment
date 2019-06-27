@@ -14,6 +14,7 @@ extension SearchViewController: UISearchBarDelegate {
         guard let text = searchBar.text, !text.elementsEqual("") else { return }
         searchedText = text
         searchBar.endEditing(true)
+        emptyView.isHidden = true
         /// clearing the old search results
         productsList.removeAll()
         collectionView.reloadData()

@@ -25,10 +25,6 @@ class ProductCell: UICollectionViewCell {
         commonInit()
     }
     
-    override func awakeFromNib() {
-        super.awakeFromNib()
-    }
-    
     func commonInit() {
         /// loading the nib file
         Bundle.main.loadNibNamed("ProductCell", owner: self, options: nil)

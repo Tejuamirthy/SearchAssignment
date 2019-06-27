@@ -12,20 +12,17 @@ import UIKit
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-    var appDelegateNavigationControllerReference: UINavigationController?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
-        
-        
-        //Setting up the Navigation Controller and pushing initial View Controller
+        /// Setting up the Navigation Controller and pushing initial View Controller
         window = UIWindow(frame: UIScreen.main.bounds)
         window?.rootViewController = UINavigationController()
-        appDelegateNavigationControllerReference = window?.rootViewController as? UINavigationController
-        let searchViewController = SearchViewController(nibName: "SearchViewController", bundle: nil)
-        appDelegateNavigationControllerReference?.pushViewController(searchViewController, animated: true)
+        if let referenceRootController = window?.rootViewController as? UINavigationController {
+            let searchViewController = SearchViewController(nibName: "SearchViewController", bundle: nil)
+            referenceRootController.pushViewController(searchViewController, animated: true)
+        }
         window?.makeKeyAndVisible()
-        
         return true
     }
 

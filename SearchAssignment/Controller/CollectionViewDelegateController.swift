@@ -25,7 +25,7 @@ extension SearchViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let alertController = UIAlertController(title: productsList[indexPath.row].name, message: "Price of the Product is - ", preferredStyle: UIAlertController.Style.alert)
         if let productPrice = productsList[indexPath.row].price?.priceDisplay {
-            alertController.message = alertController.message ?? "Price: - " + productPrice
+            alertController.message = (alertController.message ?? "Price: - ") + productPrice
         }
         let alertAction = UIAlertAction(title: "Ok", style: .cancel, handler: nil)
         alertController.addAction(alertAction)

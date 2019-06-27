@@ -11,17 +11,16 @@ import UIKit
 //Mark: - UICollectionViewFlowLayout
 extension SearchViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        //check and handle size for showing ipads logic goes here
+        /// handling size and showing items on ipads logic goes here
         adjustSize()
-        let paddingSize = sectionInsets.left * (itemsPerRow+1)
+        let paddingSize = sectionInsets.left * (itemsPerRow + 1)
         let avaialbelWidth = collectionView.frame.width - paddingSize
-        let widthPerItem = avaialbelWidth/itemsPerRow
+        let widthPerItem = avaialbelWidth / itemsPerRow
         var heightMultiplier:CGFloat = 1.7
         if UIDevice.current.model == "iPad" {
             heightMultiplier = 1.6
         }
-        
-        return CGSize(width: widthPerItem, height: heightMultiplier*widthPerItem)
+        return CGSize(width: widthPerItem, height: heightMultiplier * widthPerItem)
     }
     
     private func adjustSize() {
@@ -44,7 +43,19 @@ extension SearchViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
         return sectionInsets.left
     }
+    
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
         return sectionInsets
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForFooterInSection section: Int) -> CGSize {
+        var width: CGFloat = 0
+        var height: CGFloat = 0
+        if productsList.count % 24 == 0, !searchBool {
+            height = 20
+            width = collectionView.frame.width
+            searchBool = true
+        }
+        return CGSize(width: width, height: height)
     }
 }

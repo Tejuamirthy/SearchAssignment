@@ -48,4 +48,13 @@ extension SearchViewController: UICollectionViewDataSource {
         (cell.productNameLabel).topAnchor.constraint(equalTo: cell.productImage.bottomAnchor , constant: 20).isActive = true
         return cell
     }
+    
+    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        var footer = UICollectionReusableView()
+        if kind == UICollectionView.elementKindSectionFooter {
+            let footer2 = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: reuseFooterString, for: indexPath as IndexPath) as? CustomReusableFooter
+            footer = footer2 ?? UICollectionReusableView()
+        }
+        return footer
+    }
 }
