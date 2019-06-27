@@ -11,95 +11,55 @@ import Alamofire
 import Kingfisher
 
 class SearchViewController: UIViewController {
-    
-    private var productsList: [Product] = []
-    private var productImages: [UIImage?] = []
+    var productsList: [Product] = []
     private var searchBool: Bool = true
     private var searchedText: String = ""
     private var start = 0
-    
-    
-    //identifiers
+    /// Reuse identifiers
     let reuseCellIdentifier = "CellIdentifier"
     let reuseHeaderIdentifier = "HeaderIdentifier"
-    
-
+    /// Collection View layout constants
     private var itemsPerRow: CGFloat = 2
-    private let sectionInsets = UIEdgeInsets(top: 30, left: 10, bottom: 30, right: 10)
-    private var widthOfPhone: CGFloat = 0
-    
+    private let sectionInsets = UIEdgeInsets(top: 15, left: 10, bottom: 15, right: 10)
+    /// Collection View outlet
     @IBOutlet weak var collectionView: UICollectionView!
-    
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        widthOfPhone = collectionView.frame.width
-        
-        //Create searchBar and assigning delegate
+        /// Create a searchBar, positioning in the navigation bar and assigning delegate
         let searchBar = UISearchBar()
         searchBar.sizeToFit()
         navigationItem.titleView = searchBar
-        
         searchBar.delegate = self
-        
+        /// Assigning delegatees to the Collection View
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.prefetchDataSource = self
-        //let nib = UINib(nibName: "ProductCell", bundle: Bundle.main)
+        /// Register to Collection View
+        /// for using the xib with Fileowner set to the ProductCell class
         collectionView.register(ProductCell.self, forCellWithReuseIdentifier: reuseCellIdentifier)
-        //          (ProductCell.self, forCellWithReuseIdentifier:reuseCellIdentifier)
-        //        collectionView.register(UINib(nibName: "ProductView", bundle: Bundle.main), forCellWithReuseIdentifier: reuseCellIdentifier)
-        
-        
-        // Do any additional setup after loading the view.
+        /// OR
+        /// uncomment the last line to register with a UNib object
+        /// Here ProductCell class is set to the View in xib and not to Fileowner
+        /// collectionView.register(UINib(nibName: "ProductCell", bundle: Bundle.main), forCellWithReuseIdentifier:reuseCellIdentifier)
     }
     
-    //Implement here if you want to do something when adding products
+    /// Implement here if you want to do something while adding products
     func addProductsToList(list: [Product]) {
         productsList.append(contentsOf: list)
-        //productImages.append(contentsOf: [UIImage?](repeating: nil, count: list.count))
         collectionView.reloadData()
     }
-    
-    func productDownloadImage(indexPath: IndexPath, imageUrl: String) {
-        //productImages.append(UIImage().pngData() ?? Data())
-        //productImages.append(UIImage())
-        if indexPath.row < productImages.count {
-            Alamofire.request(imageUrl).response { (data) in
-                if data.error != nil {
-                    print("Some error caused to download image")
-                    return
-                }
-                guard let dataImage = data.data else { return }
-                //              if indexPath.row <= self.productImages.count {
-                //                  self.productImages.append(UIImage())
-                //              }
-                DispatchQueue.main.async {
-                    self.productImages[indexPath.row] = UIImage(data: dataImage)
-                }
-                print("Image downloaded for indexpath - \(indexPath)")
-            }
-        } else {
-            productImages.append(contentsOf: [UIImage?](repeating: nil, count: indexPath.row - productImages.count + 1))
-        }
-    }
-    
-    
-    func addNilImageIfNotPresent(indexPath: IndexPath) {
-        if productImages.count <= indexPath.row {
-            productImages.append(nil)
-        }
-    }
-    
+
     func checkNextElementsAvailable(_ methodName: String,indexPath: IndexPath){
         if productsList.count < indexPath.row + 12, searchBool {
-            //searchBool = false
             print("Before making api call coming from method - \(methodName)")
             makeSearchApiCall(searchText: searchedText, start: start)
         }
     }
     
+    override func willTransition(to newCollection: UITraitCollection, with coordinator: UIViewControllerTransitionCoordinator) {
+        collectionView.collectionViewLayout.invalidateLayout()
+    }
 }
 
 //Mark: - UICollectionViewDelegate
@@ -109,16 +69,9 @@ extension SearchViewController: UICollectionViewDelegate {
         let product = productsList[indexPath.row]
         customCell?.productNameLabel.numberOfLines = 2
         customCell?.productNameLabel.text = product.name
-        
-        
         customCell?.productPrice.text = product.price?.priceDisplay
-        //addNilImageIfNotPresent(indexPath: indexPath)
-        //customCell?.productImage.image = productImages[indexPath.row] ?? UIImage()
-        
-        
-        //customCell?.backgroundColor = UIColor.gray
-        
-        //checking for next elements and api call in will display
+        /// To handle the case if prefetch is not called unfortunately
+        /// This checks if it has to make an api call
         checkNextElementsAvailable("willDisplay",indexPath: indexPath)
     }
     
@@ -128,76 +81,6 @@ extension SearchViewController: UICollectionViewDelegate {
         alertController.addAction(alertAction)
         present(alertController,animated: true)
     }
-    
-    override func willTransition(to newCollection: UITraitCollection, with coordinator: UIViewControllerTransitionCoordinator) {
-        collectionView.collectionViewLayout.invalidateLayout()
-    }
-}
-
-//Mark: - UICollectionViewDataSource
-extension SearchViewController: UICollectionViewDataSource {
-    
-    
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return productsList.count
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseCellIdentifier, for: indexPath) as? ProductCell else {
-            return UICollectionViewCell()
-        }
-        //adding the image to the array if no image is available
-        //if the row is larger than the available images
-        //addNilImageIfNotPresent(indexPath: indexPath)
-        
-        
-        //cell.translatesAutoresizingMaskIntoConstraints = false
-        cell.productImage.translatesAutoresizingMaskIntoConstraints = false
-        cell.productPrice.translatesAutoresizingMaskIntoConstraints = false
-        cell.productNameLabel.translatesAutoresizingMaskIntoConstraints = false
-        
-        cell.productImage.contentMode = .scaleAspectFit
-        (cell.productImage).leadingAnchor.constraint(equalTo: cell.leadingAnchor , constant: 10).isActive = true
-        (cell.productImage).trailingAnchor.constraint(equalTo: cell.trailingAnchor , constant: -10).isActive = true
-        (cell.productImage).topAnchor.constraint(equalTo: cell.topAnchor , constant: 10).isActive = true
-        //cell.productImage.setContentCompressionResistancePriority(UILayoutPriority(rawValue: 50), for: .vertical)
-        //cell.productImage.setContentHuggingPriority(UILayoutPriority(rawValue: 200), for: .vertical)
-        
-        //(cell.productImage).bottomAnchor.constraint(equalTo: cell.productNameLabel.topAnchor , constant: -10).isActive = true
-        
-        
-        (cell.productPrice).leadingAnchor.constraint(equalTo: cell.leadingAnchor , constant: 10).isActive = true
-        (cell.productPrice).trailingAnchor.constraint(equalTo: cell.trailingAnchor , constant: -10).isActive = true
-        (cell.productPrice).bottomAnchor.constraint(equalTo: cell.bottomAnchor , constant: -10).isActive = true
-        (cell.productPrice).topAnchor.constraint(equalTo: cell.productNameLabel.bottomAnchor , constant: 0).isActive = true
-        
-        
-        (cell.productNameLabel).leadingAnchor.constraint(equalTo: cell.leadingAnchor , constant: 10).isActive = true
-        (cell.productNameLabel).trailingAnchor.constraint(equalTo: cell.trailingAnchor , constant: -10).isActive = true
-        (cell.productNameLabel).bottomAnchor.constraint(equalTo: cell.productPrice.topAnchor , constant: 0).isActive = true
-        (cell.productNameLabel).topAnchor.constraint(equalTo: cell.productImage.bottomAnchor , constant: 20).isActive = true
-        //
-        
-        // using kingfisher library for imageLoading
-        let url  = URL(string: productsList[indexPath.row].images?[0] ?? "")
-        cell.productImage.kf.setImage(with: url)
-        
-        cell.backgroundColor = UIColor.gray
-        
-        
-        //
-        //
-        //        cell.setNeedsLayout()
-        //        cell.layoutIfNeeded()
-        
-        //        if productImages.count > indexPath.row, productImages[indexPath.row] == nil {
-        //            //TODO handle if the url of the image is invalid
-        //            guard let imageUrl = productsList[indexPath.row].images?[0] else {return UICollectionViewCell()}
-        //            productDownloadImage(indexPath: indexPath, imageUrl: imageUrl)
-        //        }
-        return cell
-    }
-    
 }
 
 
@@ -261,7 +144,7 @@ extension SearchViewController: UICollectionViewDelegateFlowLayout {
 
 // Mark: - Networking using alamoFire
 extension SearchViewController {
-    //https://www.blibli.com/backend/search/products?searchTerm=iPhone&start=0&itemPerPage=24
+    
     func makeSearchApiCall(searchText: String, start: Int) {
         searchBool = false
         let parameters: [String:String] = ["searchTerm": searchText, "start": "\(start)", "itemPerPage": "24"]
@@ -269,23 +152,22 @@ extension SearchViewController {
         print(request)
         request.responseData { (dataOptional) in
             guard let data = dataOptional.data else { return }
-            print(dataOptional)
             if dataOptional.error != nil {
                 return
             }
+            print(dataOptional)
             let jsonDecoder = JSONDecoder()
             do {
                 let networkResponse = try? jsonDecoder.decode(NetworkResponse.self, from: data)
-                //handle in else when no products are found
+                /// handle in else block when no products are found
                 guard let initialList = networkResponse?.data?.products, initialList.count != 0 else { return }
                 self.start = self.start + 1
+                /// This helps to identify if a further api call to be made or not
                 if initialList.count == 24 {
                     self.searchBool = true
                 }
                 self.addProductsToList(list: initialList)
-                
-                //print(networkResponse)
-                //print(data)
+                print(networkResponse ?? "Network Response is Nil")
             }
             print(data)
         }
@@ -294,40 +176,18 @@ extension SearchViewController {
 
 //Mark: - Search bar delegate
 extension SearchViewController: UISearchBarDelegate {
-    func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
-        print("inside searchBarTextDidBeginEditing")
-        searchBar.becomeFirstResponder()
-        
-    }
-    
-    func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
-        print("inside searchBarTextDidEndEditing")
-    }
-    
-    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-        print("inside searchBarCancelButtonClicked")
-    }
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        print("inside searchBarSearchButtonClicked")
-        searchBar.resignFirstResponder()
-        
         guard let text = searchBar.text, !text.elementsEqual("") else { return }
-        
         searchedText = text
-        //clearing the old search results
+        searchBar.endEditing(true)
+        /// clearing the old search results
         productsList.removeAll()
-        productImages.removeAll()
         collectionView.reloadData()
         start = 0
-        
+        /// Making api call with the the text entered
         makeSearchApiCall(searchText: text, start: 0)
     }
-    
-    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        print("inside textDidChange")
-    }
-    
 }
 
 
