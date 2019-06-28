@@ -17,7 +17,7 @@ extension SearchViewController: UISearchBarDelegate {
         emptyView.isHidden = true
         /// clearing the old search results
         productsList.removeAll()
-        collectionView.reloadData()
+        reloadCollectionViewData()
         start = 0
         /// Making api call with the the text entered
         makeSearchApiCall(searchText: text, start: 0)

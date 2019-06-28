@@ -58,6 +58,12 @@ class SearchViewController: UIViewController {
         collectionView.register(CustomReusableFooter.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter, withReuseIdentifier: reuseFooterString)
     }
     
+    func reloadCollectionViewData() {
+        DispatchQueue.main.async {
+            self.collectionView.reloadData()
+        }
+    }
+    
     override func willTransition(to newCollection: UITraitCollection, with coordinator: UIViewControllerTransitionCoordinator) {
         collectionView.collectionViewLayout.invalidateLayout()
     }

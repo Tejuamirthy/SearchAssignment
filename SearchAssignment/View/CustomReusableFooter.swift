@@ -29,3 +29,8 @@ class CustomReusableFooter: UICollectionReusableView {
         view.centerXAnchor.constraint(equalTo: self.centerXAnchor).isActive = true
     }
 }
+
+
+class TotalTableView: UITableViewController {
+    
+}

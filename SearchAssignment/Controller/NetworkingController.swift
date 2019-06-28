@@ -14,18 +14,19 @@ extension SearchViewController {
     
     func makeSearchApiCall(searchText: String, start: Int) {
         searchBool = false
-        let parameters: [String:String] = ["searchTerm": searchText, "start": "\(start)", "itemPerPage": "24"]
-        let request = Alamofire.request("https://www.blibli.com/backend/search/products", method: .get, parameters: parameters)
-        print(request)
-        request.responseData { (dataOptional) in
-            guard let data = dataOptional.data else { return }
-            if dataOptional.error != nil {
-                self.showEmptyView()
+        //let parameters: [String] = ["searchTerm": searchText, "start": "\(start)", "itemPerPage": "24"]
+        let parameters: [String] = [searchText, "\(start)", "24"]
+    
+        guard let url = URL(string: "https://www.blibli.com/backend/search/products?searchTerm=\(parameters[0])&start=\(parameters[1])&itemPerPage=\(parameters[2])") else { return }
+
+        URLSession.shared.dataTask(with: url) { (dataOptional, urlResponseOptional, errorOptional) in
+            if errorOptional != nil {
                 return
             }
-            print(dataOptional)
-            let jsonDecoder = JSONDecoder()
+            guard let data = dataOptional else { return }
             do {
+                print(data)
+                let jsonDecoder = JSONDecoder()
                 let networkResponse = try? jsonDecoder.decode(NetworkResponse.self, from: data)
                 /// handle in else block when no products are found
                 guard let initialList = networkResponse?.data?.products, initialList.count != 0 else {
@@ -34,30 +35,60 @@ extension SearchViewController {
                 }
                 self.start = self.start + 1
                 self.hideEmptyView()
-                //self.collectionView.reloadData()
                 self.addProductsToList(list: initialList)
-                /// This helps to identify if a further api call to be made or not
-//                if initialList.count == 24 {
-//                    self.searchBool = true
-//                }
                 print(networkResponse ?? "Network Response is Nil")
             }
-            print(data)
-        }
+        }.resume()
+        
+        //let request = Alamofire.request("https://www.blibli.com/backend/search/products", method: .get, parameters: parameters)
+        //print(request)
+//        request.responseData { (dataOptional) in
+//            guard let data = dataOptional.data else { return }
+//            if dataOptional.error != nil {
+//                self.showEmptyView()
+//                return
+//            }
+//            print(dataOptional)
+//            let jsonDecoder = JSONDecoder()
+//            do {
+//                let networkResponse = try? jsonDecoder.decode(NetworkResponse.self, from: data)
+//                /// handle in else block when no products are found
+//                guard let initialList = networkResponse?.data?.products, initialList.count != 0 else {
+//                    self.showEmptyView()
+//                    return
+//                }
+//                self.start = self.start + 1
+//                self.hideEmptyView()
+//                //self.reloadCollectionViewData()
+//                self.addProductsToList(list: initialList)
+//                /// This helps to identify if a further api call to be made or not
+////                if initialList.count == 24 {
+////                    self.searchBool = true
+////                }
+//                print(networkResponse ?? "Network Response is Nil")
+//            }
+//            print(data)
+//        }
     }
     
     /// Implement here if you want to do something while adding products
     private func addProductsToList(list: [Product]) {
         productsList.append(contentsOf: list)
-        collectionView.reloadData()
+        reloadCollectionViewData()
     }
     
     func showEmptyView() {
-        emptyView.isHidden = false
+        setupEmptyView(bool: false)
     }
     
     func hideEmptyView() {
-        emptyView.isHidden = true
+        setupEmptyView(bool: true)
+    }
+    
+    func setupEmptyView(bool: Bool) {
+        DispatchQueue.main.async {
+            self.emptyView.isHidden = bool
+        }
     }
     
     func checkNextElementsAvailable(_ methodName: String,indexPath: IndexPath) {
