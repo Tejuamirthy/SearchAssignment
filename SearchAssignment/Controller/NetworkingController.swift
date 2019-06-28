@@ -15,8 +15,9 @@ extension SearchViewController {
     func makeSearchApiCall(searchText: String, start: Int) {
         searchBool = false
         //let parameters: [String] = ["searchTerm": searchText, "start": "\(start)", "itemPerPage": "24"]
-        let parameters: [String] = [searchText, "\(start)", "24"]
-    
+        guard let encodedString = searchText.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) else { return }
+        let parameters: [String] = [encodedString, "\(start)", "24"]
+
         guard let url = URL(string: "https://www.blibli.com/backend/search/products?searchTerm=\(parameters[0])&start=\(parameters[1])&itemPerPage=\(parameters[2])") else { return }
 
         URLSession.shared.dataTask(with: url) { (dataOptional, urlResponseOptional, errorOptional) in
