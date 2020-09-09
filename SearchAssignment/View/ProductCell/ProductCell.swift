@@ -33,9 +33,9 @@ class ProductCell: UICollectionViewCell {
         /// adding the View we created as a subView to the cell object
         addSubview(productCellView)
         /// setting the constraints of the above view with respect to the Collection View Cell
-        productCellView.leadingAnchor.constraint(equalTo: self.leadingAnchor)
-        productCellView.trailingAnchor.constraint(equalTo: self.trailingAnchor)
-        productCellView.topAnchor.constraint(equalTo: self.topAnchor)
-        productCellView.bottomAnchor.constraint(equalTo: self.bottomAnchor)
+        productCellView.leadingAnchor.constraint(equalTo: self.leadingAnchor).isActive = true
+        productCellView.trailingAnchor.constraint(equalTo: self.trailingAnchor).isActive = true
+        productCellView.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
+        productCellView.bottomAnchor.constraint(equalTo: self.bottomAnchor).isActive = true
     }
 }
